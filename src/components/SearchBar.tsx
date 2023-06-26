@@ -30,70 +30,82 @@ export default function SearchBar(): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
 
-// navigation effect
-useEffect(() => {
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-      event.preventDefault();
+  // navigation effect
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        event.preventDefault();
 
-      const listItems = filteredProducts.length;
-      if (listItems === 0) return;
+        const listItems = filteredProducts.length;
+        if (listItems === 0) return;
 
-      let newIndex = selectedItem;
+        let newIndex = selectedItem;
 
-      if (event.key === "ArrowUp") {
-        newIndex = (newIndex - 1 + listItems) % listItems;
-      } else if (event.key === "ArrowDown") {
-        newIndex = (newIndex + 1) % listItems;
-      }
+        if (event.key === "ArrowUp") {
+          newIndex = (newIndex - 1 + listItems) % listItems;
+        } else if (event.key === "ArrowDown") {
+          newIndex = (newIndex + 1) % listItems;
+        }
 
-      setSelectedItem(newIndex);
+        setSelectedItem(newIndex);
 
-      // Scroll to the selected item in the list
-      if (listRef.current) {
-        const selectedElements = Array.from(
-          listRef.current.children
-        ) as HTMLElement[];
-        const selectedElement = selectedElements[newIndex];
-        if (selectedElement) {
-          selectedElement.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-          });
+        // Scroll to the selected item in the list
+        if (listRef.current) {
+          const selectedElements = Array.from(
+            listRef.current.children
+          ) as HTMLElement[];
+          const selectedElement = selectedElements[newIndex];
+          if (selectedElement) {
+            selectedElement.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
+          }
+        }
+      } else if (
+        (event.ctrlKey || event.key === "Control") &&
+        event.key === "k"
+      ) {
+        event.preventDefault();
+        setSearchBarStatus(true);
+
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+
+        // open when pressing enter when input is focused
+        setSearchBarStatus(true);
+
+        // focus on input <search-bar>
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+
+        // Handle selection logic here
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        setSearchBarStatus(false);
+        setFilteredProducts([]);
+        if (inputRef.current) {
+          inputRef.current.value = "";
         }
       }
-    } else if ((event.ctrlKey || event.key === "Control") && event.key === "k") {
-      event.preventDefault();
-      setSearchBarStatus(true);
-    } else if (event.key === "Enter") {
-      event.preventDefault();
+    };
 
-      // open when pressing enter when input is focused
-      setSearchBarStatus(true);
+    document.addEventListener(
+      "keydown",
+      handleKeyDown as unknown as EventListener
+    );
 
-      // focus on input <search-bar>
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-
-      // Handle selection logic here
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      setSearchBarStatus(false);
-      setFilteredProducts([]);
-      if (inputRef.current) {
-        inputRef.current.value = "";
-      }
-    }
-  };
-
-  document.addEventListener("keydown", handleKeyDown as unknown as EventListener);
-
-  return () => {
-    document.removeEventListener("keydown", handleKeyDown as unknown as EventListener);
-  };
-}, [filteredProducts, selectedItem]);
-
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        handleKeyDown as unknown as EventListener
+      );
+    };
+  }, [filteredProducts, selectedItem]);
 
   // api request
   useEffect(() => {
@@ -197,7 +209,10 @@ useEffect(() => {
             searchBarStatus ? "" : "hidden"
           }`}
         >
-          <LuLayoutList className="h-4 w-5 text-black" />
+          <span className="text-gray-500 text-xs cursor-pointer">
+            <LuLayoutList className="h-4 w-5 text-black cursor-pointer" />
+          </span>
+
           {/* clear button */}
           <HiOutlineBackspace
             className="h-4 w-5 text-gray-500 cursor-pointer"
@@ -228,7 +243,7 @@ useEffect(() => {
           ))}
         </div>
       )}
-      {/* navigation ins */}
+      {/* navigation instructions */}
       {searchBarStatus && (
         <div className="">
           <div className="flex items-center w-1/2 justify-start">
