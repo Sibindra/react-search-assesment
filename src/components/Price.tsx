@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -10,16 +9,14 @@ interface PriceProps {
   onPriceChange: (value: string) => void;
 }
 
-export default function Price(props: PriceProps) {
-  const { price, onPriceChange } = props;
-
+export default function Price({ price, onPriceChange }: PriceProps) {
   const handleChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
     onPriceChange(value);
   };
 
   const priceOptions = [
-    { label: "None", value: "" },
+    { label: "None", value: "None" },
     { label: "less than $20", value: "<20" },
     { label: "less than $50", value: "<50" },
     { label: "less than $100", value: "<100" },
@@ -31,7 +28,7 @@ export default function Price(props: PriceProps) {
   ];
 
   return (
-    <div>
+    <div className="p-2">
       <Box sx={{ minWidth: 120 }}>
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">Price</InputLabel>

@@ -25,7 +25,7 @@ export default function Categories(props: CategoriesProps) {
   ];
 
   return (
-    <div>
+    <div className="p-2">
       <Box sx={{ minWidth: 120 }}>
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">Category</InputLabel>
