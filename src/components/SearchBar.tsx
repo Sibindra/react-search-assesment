@@ -3,10 +3,12 @@ import { FiSearch, FiArrowUp, FiArrowDown } from "react-icons/fi";
 import { AiOutlineEnter } from "react-icons/ai";
 import { HiOutlineBackspace } from "react-icons/hi";
 import { LuLayoutList } from "react-icons/lu";
+
+// select components
 import Categories from "./Categories";
 import Price from "./Price";
 
-// api
+// fetch component
 import fetchProducts from "./api";
 
 interface Product {
@@ -21,22 +23,38 @@ interface SearchBarProps {
 }
 
 export default function SearchBar(props: SearchBarProps): JSX.Element {
+  // search bar pop up 
   const [searchBarStatus, setSearchBarStatus] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+
+  // filtering search results
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const listRef = useRef<HTMLDivElement>(null);
+
+  // selected items for up and down navigation with up and down keys
   const [selectedItem, setSelectedItem] = useState(-1);
+
+  // ref's
+  const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
+
+  // category 
   const [selectedCategory, setSelectedCategory] = useState("");
+
+  // price prop from price component
   const { priceValue } = props;
+
+  // price state
   const [price, setPrice] = useState(priceValue);
 
+  // categories and price ref's
   const categoriesRef = useRef<HTMLDivElement>(null);
   const priceRef = useRef<HTMLDivElement>(null);
 
+  // ref to div below search bar div
   const emptyDivRef = useRef<HTMLInputElement>(null);
 
+  
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
   };
@@ -45,6 +63,8 @@ export default function SearchBar(props: SearchBarProps): JSX.Element {
     setPrice(value);
   };
 
+
+  // navigation and keyboard handles
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -71,7 +91,7 @@ export default function SearchBar(props: SearchBarProps): JSX.Element {
           }
         }
       } else if (
-        (event.ctrlKey || event.key === "Control") &&
+        (event.ctrlKey || event.key === "Control") && //CTRL K
         event.key === "k"
       ) {
         event.preventDefault();
@@ -79,13 +99,13 @@ export default function SearchBar(props: SearchBarProps): JSX.Element {
         if (inputRef.current) {
           inputRef.current.focus();
         }
-      } else if (event.key === "Enter") {
+      } else if (event.key === "Enter") { //enter on focus
         event.preventDefault();
         setSearchBarStatus(true);
         if (inputRef.current) {
           inputRef.current.focus();
         }
-      } else if (event.key === "Escape") {
+      } else if (event.key === "Escape") { //esc
         event.preventDefault();
         setSearchBarStatus(false);
         setFilteredProducts([]);
@@ -108,6 +128,8 @@ export default function SearchBar(props: SearchBarProps): JSX.Element {
     };
   }, [filteredProducts, selectedItem]);
 
+
+  // api 
   useEffect(() => {
     fetchProducts()
       .then((response) => {
@@ -126,6 +148,7 @@ export default function SearchBar(props: SearchBarProps): JSX.Element {
     setFilteredProducts([]);
   };
 
+  // search filterations
   useEffect(() => {
     handleSearch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -205,6 +228,7 @@ export default function SearchBar(props: SearchBarProps): JSX.Element {
     setSelectedItem(-1);
   };
 
+  // click to searchbar
   const handleClick = () => {
     setSearchBarStatus(true);
   };
@@ -239,14 +263,19 @@ useEffect(() => {
 }, [setSearchBarStatus]);
 
 
+// RETURN HERE
   return (
-    <div className="flex flex-col w-full h-full">
+    // main div with flex-col and 2 child div 
+    <div className="flex flex-col w-full h-full"> 
+
+    {/* searchbar div */}
     <div className="flex flex-1 justify-center w-full" ref={searchBarRef}>
       <div
         className={`p-1 rounded-lg flex justify-between flex-col ${
           searchBarStatus ? "w-full h-auto border-2 p-3" : ""
         }`}
       >
+
         <div className="relative flex justify-between items-center">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3">
             <FiSearch className="h-5 w-5 text-gray-500" />
@@ -292,6 +321,7 @@ useEffect(() => {
           </div>
         </div>
   
+  {/* pop up div for searchbar */}
         {searchBarStatus && (
           <div className="my-2 h-40 overflow-y-auto overflow-x-hidden" ref={listRef}>
             {filteredProducts.map((product, index) => (
@@ -310,6 +340,7 @@ useEffect(() => {
           </div>
         )}
   
+  {/* navigation information div  */}
         {searchBarStatus && (
           <div className="">
             <div className="flex items-center w-full justify-start">
@@ -335,6 +366,7 @@ useEffect(() => {
         )}
       </div>
   
+  {/* div containing select items */}
       <div className={`flex flex-col md:flex-row h-full m-3 ${searchBarStatus ? "" : "hidden"}`}>
         <Categories
           category={selectedCategory}
@@ -344,6 +376,7 @@ useEffect(() => {
         <Price price={price} onPriceChange={handlePriceChange} />
       </div>
     </div>
+    {/* empty div : when clicked closes pop up searchbar */}
     <div className="flex-1" ref={emptyDivRef}>
       {/* empty div */}
     </div>
